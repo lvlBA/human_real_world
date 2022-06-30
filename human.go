@@ -1,5 +1,7 @@
 package hrw
 
+import "errors"
+
 const (
 	ParentTypeUnknown ParentType = iota
 	ParentTypeFather
@@ -33,24 +35,25 @@ func (h Human) DoJob() error {
 }
 
 func (h Human) DemandShopping(goods *GoodsCard) bool {
-	switch {
-	case !h.checkGoods(goods.Type):
+	if !h.checkGoods(goods.Type) {
 		return false
-	case !h.checkMoney(goods.Price):
+	}
+
+	if ok, _ := h.checkMoney(goods.Price); !ok {
 		return false
 	}
 
 	return true
 }
 
-func (h Human) checkMoney(count uint) bool {
-	for _, v := range h.Wallets {
+func (h Human) checkMoney(count uint) (bool, WalletType) {
+	for k, v := range h.Wallets {
 		if v >= count {
-			return true
+			return true, k
 		}
 	}
 
-	return false
+	return false, WalletTypeUnknown
 }
 
 func (h Human) checkGoods(gt TypeGoods) bool {
@@ -64,6 +67,24 @@ func (h Human) checkGoods(gt TypeGoods) bool {
 	}
 
 	return true
+}
+func (h Human) BuyGoods(price uint, goods interface{}) error {
+	ok, wt := h.checkMoney(price)
+	if !ok {
+		return errors.New("not enough money")
+	}
+
+	switch g := goods.(type) {
+	case *Eatable:
+		h.HP += g.Calories
+	case *Clothes:
+		h.Wardrobe = append(h.Wardrobe, g)
+	default:
+		return errors.New("IDK what it is")
+	}
+	h.Wallets[wt] -= price
+
+	return nil
 }
 
 func (h Human) checkClothes() bool {

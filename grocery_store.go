@@ -10,8 +10,26 @@ const (
 	TypeGoodsEatable
 	TypeGoodsClothes
 )
+const (
+	stringTypeOfGoodsUnknown = "UNKNOWN"
+	stringTypeGoodsEatable   = "EATABLE"
+	stringTypeGoodsClothes   = "CLOTHES"
+)
+
+var resolveTypeGoodsToString = map[TypeGoods]string{
+	TypeGoodsEatable: stringTypeGoodsEatable,
+	TypeGoodsClothes: stringTypeGoodsClothes,
+}
 
 type TypeGoods uint
+
+func (t TypeGoods) String() string {
+	str, exist := resolveTypeGoodsToString[t]
+	if exist {
+		return str
+	}
+	return stringTypeOfGoodsUnknown
+}
 
 type GoodsCard struct {
 	Brand string
@@ -25,6 +43,22 @@ type GroceryStore struct {
 	WorkingHoursBegin time.Time
 	WorkingHoursEnd   time.Time
 	Warehouse         map[TypeGoods][]*GoodsCard
+	BankAccount       uint
+}
+
+func (s *GroceryStore) removeGoods(gc *GoodsCard) error {
+	gs, exists := s.Warehouse[gc.Type]
+	if !exists {
+		return fmt.Errorf("type of good %s is not exist", gc.Type)
+	}
+	for i := range gs {
+		if gs[i] == gc {
+			s.Warehouse[gc.Type] = append(gs[:i], gs[i+1:]...) // gs[2 : 10] взять из массива срез  от второго инджкса включительно по 10 индекс не включиттельно
+			return nil
+		}
+	}
+
+	return fmt.Errorf("card for goods %s is not found", gc.Brand)
 }
 
 func (s GroceryStore) GetVisitor(human Human) error {
@@ -41,8 +75,17 @@ func (s GroceryStore) GetVisitor(human Human) error {
 			}
 		}
 	}
+	for _, gs := range basket {
+		if err := human.BuyGoods(gs.Price, gs.Goods); err == nil {
+			s.BankAccount += gs.Price
+			if err := s.removeGoods(gs); err != nil {
+				// show logs
+				fmt.Printf("failed to calc goods at warehouse: %v\n", err)
+			}
+		}
+	}
 
-	//Payment issues
-	// Say Good bye to the client
+	fmt.Printf("Bye bye %s\n", human.Name)
+
 	return nil
 }
