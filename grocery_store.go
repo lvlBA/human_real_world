@@ -54,6 +54,7 @@ func (s *GroceryStore) removeGoods(gc *GoodsCard) error {
 	for i := range gs {
 		if gs[i] == gc {
 			s.Warehouse[gc.Type] = append(gs[:i], gs[i+1:]...) // gs[2 : 10] взять из массива срез  от второго инджкса включительно по 10 индекс не включиттельно
+
 			return nil
 		}
 	}
@@ -64,6 +65,7 @@ func (s *GroceryStore) removeGoods(gc *GoodsCard) error {
 func (s GroceryStore) GetVisitor(human Human) error {
 	now := time.Now()
 	if now.Before(s.WorkingHoursBegin) || now.After(s.WorkingHoursEnd) {
+
 		return fmt.Errorf("shop is closed, working hours from %s to %s", s.WorkingHoursBegin, s.WorkingHoursEnd)
 	}
 

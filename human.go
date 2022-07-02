@@ -2,6 +2,10 @@ package hrw
 
 import "errors"
 
+type Humaner interface {
+	getSalary() uint8
+}
+
 const (
 	ParentTypeUnknown ParentType = iota
 	ParentTypeFather
@@ -9,14 +13,6 @@ const (
 )
 
 type ParentType uint8
-
-const (
-	WalletTypeUnknown WalletType = iota
-	WalletTypeCash
-	WalletTypeCreditCard
-)
-
-type WalletType uint8
 
 // Human - describe a person in the real world
 type Human struct {
@@ -27,7 +23,8 @@ type Human struct {
 	Parents  map[ParentType]*Human // Parents - amounts of parents
 	Wallets  map[WalletType]uint   // Wallets - storage all wallets of a person
 	HP       uint8                 // HP - Health Point
-	Wardrobe []*Clothes
+	Wardrobe []*Clothes            // Wardrobe - place where person store clothes
+	JobPlace *Employer             //	JobPlace - place where person is working
 }
 
 func (h Human) DoJob() error {
@@ -68,6 +65,19 @@ func (h Human) checkGoods(gt TypeGoods) bool {
 
 	return true
 }
+
+func (h Human) checkHeals(hp uint8) bool {
+	if h.HP < 10 {
+		if ok, _ := h.checkMoney(100); !ok {
+			return true
+		}
+
+	}
+
+	return true
+
+}
+
 func (h Human) BuyGoods(price uint, goods interface{}) error {
 	ok, wt := h.checkMoney(price)
 	if !ok {
