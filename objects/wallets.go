@@ -1,4 +1,4 @@
-package hrw
+package objects
 
 const (
 	WalletTypeUnknown WalletType = iota

@@ -1,4 +1,4 @@
-package hrw
+package objects
 
 type Eatable struct {
 	Name     string

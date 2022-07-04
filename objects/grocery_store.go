@@ -1,4 +1,4 @@
-package hrw
+package objects
 
 import (
 	"fmt"

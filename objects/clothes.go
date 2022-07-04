@@ -1,4 +1,4 @@
-package hrw
+package objects
 
 type Clothes struct {
 	Name      string

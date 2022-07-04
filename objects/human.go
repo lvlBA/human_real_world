@@ -1,6 +1,8 @@
-package hrw
+package objects
 
-import "errors"
+import (
+	"errors"
+)
 
 type Humaner interface {
 	getSalary() uint8
@@ -76,6 +78,10 @@ func (h Human) checkHeals(hp uint8) bool {
 
 	return true
 
+}
+
+func (h Human) Depression() string {
+	return "I don't wanna work today"
 }
 
 func (h Human) BuyGoods(price uint, goods interface{}) error {
